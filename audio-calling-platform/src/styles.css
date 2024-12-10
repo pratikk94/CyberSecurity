@@ -1,0 +1,54 @@
+.home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(120deg, #6a11cb, #2575fc); /* Purple to Blue Gradient */
+    color: white;
+    text-align: center;
+  }
+  
+  .home h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .home p {
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+  }
+  
+  .button-container {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .nav-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+  }
+  
+  .nav-button.sender {
+    background-color: #4caf50; /* Green */
+    color: white;
+  }
+  
+  .nav-button.sender:hover {
+    background-color: #43a047; /* Darker Green */
+    transform: scale(1.05);
+  }
+  
+  .nav-button.receiver {
+    background-color: #f44336; /* Red */
+    color: white;
+  }
+  
+  .nav-button.receiver:hover {
+    background-color: #d32f2f; /* Darker Red */
+    transform: scale(1.05);
+  }
