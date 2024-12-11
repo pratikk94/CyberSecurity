@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Peer, { DataConnection } from 'peerjs';
+import Peer, { DataConnection, MediaConnection } from 'peerjs';
 import axios from 'axios';
 
 const AudioSender: React.FC = () => {
@@ -8,8 +8,10 @@ const AudioSender: React.FC = () => {
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const peer = useRef<Peer | null>(null);
   const connection = useRef<DataConnection | null>(null);
+  const callRef = useRef<MediaConnection | null>(null);
 
   useEffect(() => {
+    // Function to fetch a unique Peer ID from the backend
     const fetchPeerId = async () => {
       try {
         const response = await axios.get('http://localhost:3002/peerjs/get_id', {
@@ -24,6 +26,7 @@ const AudioSender: React.FC = () => {
       }
     };
 
+    // Initialize PeerJS with the fetched Peer ID
     const initializePeer = async () => {
       const id = await fetchPeerId();
       if (!id) return;
@@ -50,11 +53,13 @@ const AudioSender: React.FC = () => {
     };
 
     initializePeer();
+
     return () => {
       peer.current?.destroy();
     };
   }, []);
 
+  // Function to connect to the receiver via PeerJS
   const connectToReceiver = () => {
     if (!receiverId) {
       alert('Please enter a valid Receiver Peer ID');
@@ -87,6 +92,7 @@ const AudioSender: React.FC = () => {
     }
   };
 
+  // Function to start streaming audio to the receiver
   const startStream = async () => {
     if (!receiverId) {
       alert('Please enter a valid Receiver Peer ID');
@@ -97,19 +103,37 @@ const AudioSender: React.FC = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
 
+      console.log('Streaming audio to receiver...');
       if (peer.current) {
-        const call = peer.current.call(receiverId, stream);
+        callRef.current = peer.current.call(receiverId, stream);
 
-        call.on('stream', (remoteStream) => {
+        callRef.current.on('stream', (remoteStream) => {
           console.log('Received remote stream:', remoteStream);
         });
 
-        call.on('close', () => {
+        callRef.current.on('close', () => {
           console.log('Call closed');
+        });
+
+        callRef.current.on('error', (err) => {
+          console.error('Call error:', err);
         });
       }
     } catch (err) {
       console.error('Error starting audio stream:', err);
+    }
+  };
+
+  // Stop streaming if necessary
+  const stopStream = () => {
+    if (callRef.current) {
+      callRef.current.close();
+      console.log('Stopped streaming audio to receiver.');
+    }
+
+    if (audioStream) {
+      audioStream.getTracks().forEach((track) => track.stop());
+      setAudioStream(null);
     }
   };
 
@@ -125,6 +149,7 @@ const AudioSender: React.FC = () => {
       />
       <button onClick={connectToReceiver}>Connect to Receiver</button>
       <button onClick={startStream}>Start Stream</button>
+      <button onClick={stopStream}>Stop Stream</button>
     </div>
   );
 };

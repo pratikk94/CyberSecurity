@@ -19,7 +19,7 @@ export class PeerJsGateway {
   }
 
   start() {
-    // Add CORS middleware
+    // CORS middleware
     this.app.use((req, res, next) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader(
@@ -37,11 +37,11 @@ export class PeerJsGateway {
     this.peerServer = ExpressPeerServer(this.server, {
       path: '/',
       allow_discovery: true,
-    //   cleanup_outdated_peers: true, // Automatically clean stale peers
     });
 
     this.app.use('/', this.peerServer);
 
+    // Peer ID endpoint
     this.app.get('/peerjs/get_id', (req, res) => {
       const ts = req.query.ts || Date.now();
       const version = req.query.version || '1.5.4';
@@ -54,12 +54,14 @@ export class PeerJsGateway {
     });
 
     this.peerServer.on('disconnect', (client) => {
-      console.log(`Peer disconnected: ${client.getId ? client.getId() : client}`);
+      console.log(
+        `Peer disconnected: ${client.getId ? client.getId() : client}`,
+      );
     });
 
     this.peerServer.on('call', (call) => {
       console.log(`Incoming call from peer: ${call.peer}`);
-      call.answer();
+      call.answer(); // Answer the call
 
       call.on('stream', (stream) => {
         console.log('Received audio stream');
@@ -75,9 +77,12 @@ export class PeerJsGateway {
       });
     });
 
+    // Start the server
     const PORT = 3002;
     this.server.listen(PORT, () => {
-      console.log(`PeerJS server is running at http://localhost:${PORT}/peerjs`);
+      console.log(
+        `PeerJS server is running at http://localhost:${PORT}/peerjs`,
+      );
     });
   }
 
@@ -86,6 +91,7 @@ export class PeerJsGateway {
     peerId: string,
   ): Promise<void> {
     console.log(`Processing audio stream from peer: ${peerId}`);
+
     const request = {
       config: {
         encoding: 'LINEAR16' as const,
@@ -108,6 +114,12 @@ export class PeerJsGateway {
               'en',
             );
             console.log(`Translated: ${translatedText}`);
+
+            // Send the translated text back to connected peers
+            this.sendToAllConnectedPeers(peerId, {
+              type: 'text-chunk',
+              text: translatedText,
+            });
           } catch (error) {
             console.error('Translation error:', error);
           }
@@ -123,6 +135,15 @@ export class PeerJsGateway {
     stream.on('end', () => {
       recognizeStream.end();
       console.log('Audio stream ended');
+    });
+  }
+
+  private sendToAllConnectedPeers(senderId: string, message: any): void {
+    this.peerServer._clients.peerjs.forEach((client: any, peerId: string) => {
+      if (peerId !== senderId && client) {
+        console.log(`Sending message to peer ${peerId}`);
+        client.send(message);
+      }
     });
   }
 }
