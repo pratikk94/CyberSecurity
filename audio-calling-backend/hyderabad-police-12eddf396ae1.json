@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "hyderabad-police",
+  "private_key_id": "12eddf396ae121d50da09238e25bb611f48ffb0c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDLbZxmcEJfaphf\nF0qu04ue2TP+u0WdzCJIyvdjJkWAgi293T48SLP7w71Ycoxb+Yj3KnJUC6jULW/x\nSJ/dK345xD37hcjl3kAxuRnSLc+89mPGMSI+7fGekDz4sUid1FzqgOPH0Y2C82M7\n6HlEoSGPJAKC/cseg7AGy0Cx/ffWdFY6tVHAbK3ZK3yluvVeZFtENtHUsYKEP0ly\ntG10AlIUI+YdzNDOrsCiUf2cOCAV3/IktYic9VK700d5GN+AGkJgM6/NHtebm0PO\nOtQeD2gt5ncQ/ozQkd4y9kW/HxIt5Ky31q56CSIVxvWwv9gOo4LPlLRSzJko4Qvt\nMBvOgkt7AgMBAAECggEADpEx0vAVAKoscRrE4VIKvHxHSeV1LcCRb+8A2hvCfFpW\nFjOComR+Zvf0ViIVxPxQf4qNl1EibNc4HeoacIcNyeswmRNSeIt6w1TC8ZcQOjLW\noDmifykg1T707sYbMhoj8TL7nLJ31LnDEGYsUOrM8Wgdue2cnvnFICdr4ZMTLUsU\nmYLQUyq+jno5g10HjDOeVyysLaQi6R+bBv4zPp8a5qL6S2PCscjEOPU9bUh0L2K7\nyxrV1cykydFlGbZ/ivNqf2c62DRz2J11uH0B7+iZPW6HK3LEg6NhgYV60sndQN0S\n0kshu9WteCY5RA0FOeuepVFbU+AJK3uqoMkpH4RhuQKBgQD4GN+sQeeapeT/JdJQ\n09pxj4zDG+F0tgdnr+eT2ku/Ksk/pZ65P27qMsEK8Z+ErBBgXjHoqFaqh9PaQUdo\nFzhNDmK0SD8tmu6osg01A2GshAQzNKUWreLzXLzj2w03lxqTOPdT+/uOc+3ZPqtI\nu4J5Q0faQjAyuWprZzWz5VcVLwKBgQDR6HsMifiuG7jTfepWr8lu7S06ueLz021H\nBsGZkbra0ldFn9WbweaKPtQTv9KDT6+l967wtV73RkMEiDD350aTy5XWZtr4VO+u\n6g/sZ7pFdBxhwUvhd2dzKTHH/htX2WBYeuSWt3iV/L536O18x/tsA1OioU97rmwX\nzE3DIobzdQKBgQDsaD9S1GYObgAcxPx4urcPuRsHnByk6wN5YRwJPl0pZ2rndDkg\nCnr1PbHHbOB1OsRMH9Xs/eO/kbhk5AlX/bBPdOLHKYTSPy0loKyHFJbRHecmqAab\n6sw02+y+LrCUhS70lLbQ128omf1OIrJylwLH7D2ek6172ES43VtF9caaTwKBgFas\nbSq3SdTyo3XIt1uGCGHiU1u9Z8YQVj4OvyAfOY2jbt/T6MsA3KXW3ZEuEsmfvMKG\nLFk+OvFVtNSJO9cRS2Y5mSxHmkESKUoLYfnWtuZ41ENVInT97dxydRjEhxvWKV8/\nl2XYalVcYHV42587oEhwczdi7kP+uKl29eEOP7UFAoGAakMkIsYHn9pTEdVqcW1F\nm6SZQaYt63s+rlRRhi9CVORsDt5LDnM/oLb9IWlOGYGHOzFSQ7xFepTyv3jUtS+S\ne/EJ4VYPGBfwemFcoyZXncOm3hQSZSCWFximU78g/WPe6pZ0SkeCiT713U9vE4qj\ni8uccNzUXg7O0QuQXTTtIKc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "hyd-pol@hyderabad-police.iam.gserviceaccount.com",
+  "client_id": "114215619753135101118",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hyd-pol%40hyderabad-police.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -1,79 +1,130 @@
-import React, { useEffect, useState } from 'react';
-import Peer from 'peerjs';
+import React, { useState, useEffect, useRef } from 'react';
+import Peer, { DataConnection } from 'peerjs';
+import axios from 'axios';
 
 const AudioSender: React.FC = () => {
   const [peerId, setPeerId] = useState<string | null>(null);
   const [receiverId, setReceiverId] = useState<string>('');
-  const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<string>('Not connected');
-
-  const peer = new Peer();
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const peer = useRef<Peer | null>(null);
+  const connection = useRef<DataConnection | null>(null);
 
   useEffect(() => {
-    peer.on('open', (id) => {
-      setPeerId(id);
-      console.log('Sender Peer ID:', id);
-    });
+    const fetchPeerId = async () => {
+      try {
+        const response = await axios.get('http://localhost:3002/peerjs/get_id', {
+          params: { ts: Date.now(), version: '1.5.4' },
+        });
+        console.log('Fetched Peer ID:', response.data.id);
+        setPeerId(response.data.id);
+        return response.data.id;
+      } catch (error) {
+        console.error('Error fetching Peer ID:', error);
+        return null;
+      }
+    };
 
-    peer.on('connection', (conn) => {
-      setConnectionStatus('Connected');
-      console.log('Connected to receiver:', conn.peer);
-    });
+    const initializePeer = async () => {
+      const id = await fetchPeerId();
+      if (!id) return;
 
+      peer.current = new Peer(id, {
+        host: 'localhost',
+        port: 3002,
+        path: '/',
+        debug: 2,
+      });
+
+      peer.current.on('open', (id) => {
+        console.log('Sender Peer ID:', id);
+      });
+
+      peer.current.on('error', (err) => {
+        console.error('PeerJS error:', err);
+      });
+
+      peer.current.on('disconnected', () => {
+        console.log('Peer disconnected. Attempting to reconnect...');
+        peer.current?.reconnect();
+      });
+    };
+
+    initializePeer();
     return () => {
-      peer.disconnect();
+      peer.current?.destroy();
     };
   }, []);
 
-  const startStreaming = async (receiverId: string) => {
-    if (!selectedDevice) return;
+  const connectToReceiver = () => {
+    if (!receiverId) {
+      alert('Please enter a valid Receiver Peer ID');
+      return;
+    }
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { deviceId: selectedDevice },
+    console.log(`Attempting to connect to receiver with ID: ${receiverId}`);
+
+    if (peer.current) {
+      connection.current = peer.current.connect(receiverId);
+
+      connection.current.on('open', () => {
+        console.log(`Connection established with receiver: ${receiverId}`);
+        const testMessage = { type: 'text-chunk', text: 'Hello, this is a test message!' };
+        connection.current?.send(testMessage);
+        console.log('Sent message to receiver:', testMessage);
       });
 
-      const call = peer.call(receiverId, stream);
-
-      call.on('close', () => {
-        setConnectionStatus('Connection closed');
-        console.log('Call closed');
+      connection.current.on('data', (data) => {
+        console.log('Received data from receiver:', data);
       });
 
-      setConnectionStatus('Streaming audio...');
-    } catch (err) {
-      console.error('Error accessing audio device:', err);
+      connection.current.on('close', () => {
+        console.log(`Connection with receiver ${receiverId} has been closed`);
+      });
+
+      connection.current.on('error', (err) => {
+        console.error('Connection error:', err);
+      });
     }
   };
 
-  useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const audioInputs = devices.filter((device) => device.kind === 'audioinput');
-      setAudioDevices(audioInputs);
-      if (audioInputs.length > 0) setSelectedDevice(audioInputs[0].deviceId);
-    });
-  }, []);
+  const startStream = async () => {
+    if (!receiverId) {
+      alert('Please enter a valid Receiver Peer ID');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setAudioStream(stream);
+
+      if (peer.current) {
+        const call = peer.current.call(receiverId, stream);
+
+        call.on('stream', (remoteStream) => {
+          console.log('Received remote stream:', remoteStream);
+        });
+
+        call.on('close', () => {
+          console.log('Call closed');
+        });
+      }
+    } catch (err) {
+      console.error('Error starting audio stream:', err);
+    }
+  };
 
   return (
     <div>
       <h1>Audio Sender</h1>
-      <p>Your Peer ID: {peerId}</p>
-      <p>Status: {connectionStatus}</p>
-      <select onChange={(e) => setSelectedDevice(e.target.value)} value={selectedDevice || ''}>
-        {audioDevices.map((device) => (
-          <option key={device.deviceId} value={device.deviceId}>
-            {device.label || `Microphone ${device.deviceId}`}
-          </option>
-        ))}
-      </select>
+      <p>Your Peer ID: {peerId || 'Generating...'}</p>
       <input
         type="text"
         placeholder="Enter Receiver Peer ID"
         value={receiverId}
         onChange={(e) => setReceiverId(e.target.value)}
       />
-      <button onClick={() => startStreaming(receiverId)}>Start Streaming</button>
+      <button onClick={connectToReceiver}>Connect to Receiver</button>
+      <button onClick={startStream}>Start Stream</button>
     </div>
   );
 };
